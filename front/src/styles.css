@@ -1,1 +1,70 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  /* text styles */
+  --f-primary: InterVariable;
+  --f-code: JetBrainsMono;
+  /* colors */
+  --c-l0: #000000;
+  --c-l1: #1b1b1b;
+  --c-l2: #0e0e0e;
+  --c-text: #fff;
+  --c-text-faded: #777;
+  --c-stroke: #191919;
+  --c-accent-l0: #fff;
+  --c-accent-text: #000;
+  /* gradients */
+  --grad-overlay: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgb(0, 0, 0));
+  /* sizes */
+  --s-content: 700px;
+  --s-stroke: 1px;
+  --s-chat-container-offset: 20px;
+  /* paddings */
+  --p-button-v: 3px;
+  --p-button: var(--p-button-v) 11px;
+  --p-chat-container-v: 14px;
+  --p-content-b: calc(
+    1rem * (var(--textarea-lines-min) + 2)
+      /* extra line for buttons and main padding */ +
+      var(--p-chat-container-v) * 2 + var(--p-button-v) * 2 +
+      var(--s-chat-container-offset)
+  );
+  /* misc */
+  --textarea-lines-min: 2;
+  --border-radius: 16px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: hsla(var(--c-stroke) / 35%) transparent;
+  outline-color: var(--c-stroke);
+}
+
+body {
+  background: var(--c-l0);
+}
+
+/* components */
+.autosize-text-area {
+  min-height: var(--textarea-lines-min) lh;
+  max-height: 10lh;
+  display: grid;
+  &::after {
+    visibility: hidden;
+    content: attr(data-value);
+  }
+  &::after,
+  & textarea {
+    grid-area: 1/1;
+    white-space: pre-line;
+  }
+  & textarea {
+    min-width: 1em;
+    box-sizing: content-box;
+    outline: none;
+    overflow: hidden;
+    padding: 0;
+    resize: none;
+  }
+}

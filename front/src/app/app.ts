@@ -1,12 +1,13 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
+  imports: [FormsModule],
 })
 export class App {
-  protected readonly title = signal('codex-intake-webdev');
+  readonly chatValue = signal('');
+  protected readonly console = console;
 }
