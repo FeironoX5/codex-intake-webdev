@@ -24,8 +24,22 @@ main {
 .chat-container {
   position: fixed;
   bottom: var(--s-chat-container-offset);
-  background: blue;
   padding: var(--p-chat-container-v) 16px;
+  padding-top: calc(var(--p-chat-container-v) - var(--p-textarea-v));
+  background: var(--c-l2);
+  border-radius: var(--border-radius);
+  outline-width: var(--s-stroke);
+  outline-style: solid;
+}
+
+.chat-container textarea {
+  width: 100%;
+  color: var(--c-text);
+  background: transparent;
+}
+
+.chat-container textarea::placeholder {
+  color: var(--c-text-faded);
 }
 
 .sp {
@@ -33,4 +47,11 @@ main {
   height: 50px;
   background: red;
   margin: 0 0 20px;
+}
+
+@media (max-width: 700px) {
+  .chat-container {
+    border-radius: 0;
+    bottom: 0;
+  }
 }
