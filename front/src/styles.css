@@ -46,25 +46,11 @@ body {
 }
 
 /* components */
-.autosize-text-area {
-  min-height: var(--textarea-lines-min) lh;
-  max-height: 10lh;
-  display: grid;
-  &::after {
-    visibility: hidden;
-    content: attr(data-value);
-  }
-  &::after,
-  & textarea {
-    grid-area: 1/1;
-    white-space: pre-line;
-  }
-  & textarea {
-    min-width: 1em;
-    box-sizing: content-box;
-    outline: none;
-    overflow: hidden;
-    padding: 0;
-    resize: none;
-  }
+textarea.autosize {
+  white-space: pre-wrap;
+  padding: 1px;
+  /* todo fix autosize with 0 padding */
+  outline: none;
+  resize: none;
+  overflow: hidden;
 }
