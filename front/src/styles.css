@@ -18,6 +18,7 @@
   --s-content: 700px;
   --s-stroke: 1px;
   --s-chat-container-offset: 20px;
+  --s-button-gap: 4px;
   /* paddings */
   --p-button-v: 3px;
   --p-button: var(--p-button-v) 11px;
@@ -33,6 +34,7 @@
   --textarea-lines-min: 2;
   --textarea-lines-max: 4;
   --border-radius: 16px;
+  --transition: 0.1s ease-out;
 }
 
 *,
@@ -45,6 +47,7 @@
 }
 
 html {
+  color: var(--c-text);
   font-size: var(--s-font);
   line-height: 1.15;
 }
@@ -59,6 +62,40 @@ textarea {
   outline: none;
   resize: none;
   overflow: hidden;
+}
+
+button {
+  background: none;
+  border: none;
+  outline-width: var(--s-stroke);
+  outline-style: solid;
+  border-radius: var(--border-radius);
+  color: var(--c-text-faded);
+  padding: var(--p-button);
+  cursor: pointer;
+  transition:
+    color var(--transition),
+    outline-color var(--transition);
+  display: flex;
+  align-items: center;
+  gap: var(--s-button-gap);
+}
+
+button:hover {
+  color: var(--c-text);
+  outline-color: var(--c-text);
+}
+
+button.active {
+  outline-color: var(--c-accent-l0);
+  background: var(--c-accent-l0);
+  color: var(--c-accent-text);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  /* todo override hover */
 }
 
 /* components */
