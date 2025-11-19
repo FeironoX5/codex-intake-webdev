@@ -31,8 +31,4 @@ app.post('/api', async (req, res) => {
 });
 
 const port = 3000;
-try {
-    app.listen(port, () => console.log(`runs on http://localhost:${port}`));
-} catch (e) {
-    console.error(e);
-}
+app.listen(port, () => console.log(`runs on http://localhost:${port}`));
