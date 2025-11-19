@@ -4,6 +4,7 @@ links:
 - zeplin: https://app.zeplin.io/project/5b4f2f07729e51c208c27414/screen/69175214f09b12d688d30cea
 - figma: https://www.figma.com/design/OYERN0YVPLt1JmYbF9d3te/LOCAL-DRAFT?node-id=1805-1588&t=DS3AmnvmTHCSPcg5-0
 - ai-proxy: https://github.com/slaveeks/ai-proxy
+- ai-proxy docs: http://llm.codex.so/docs
 
 todo:
 
