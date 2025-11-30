@@ -1,0 +1,69 @@
+:host {
+  display: contents;
+}
+.message {
+  position: relative;
+  width: 100%;
+  align-self: flex-start;
+  & .actions {
+    position: absolute;
+    left: 0;
+    bottom: calc(-1 * var(--s-icon-button-height));
+    display: flex;
+    gap: 5px;
+  }
+  &.user {
+    background: var(--c-l1);
+    align-self: flex-end;
+    width: 60%;
+    border-radius: var(--border-radius);
+    border-bottom-right-radius: calc(var(--border-radius) * 0.2);
+    user-select: none;
+    padding: 10px 15px;
+    & .actions {
+      left: calc(-1 * var(--s-icon-button-height));
+      bottom: calc(50% - var(--s-icon-button-height) / 2);
+      display: flex;
+      gap: 5px;
+    }
+  }
+  &.error {
+    background: #0e0d0d;
+    color: #a00;
+  }
+  & details {
+    color: var(--c-text-faded);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    &[open] {
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    &[open] summary .chevron {
+      transform: rotate(180deg);
+    }
+  }
+  & summary {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    & lucide-angular {
+      height: 1lh;
+      display: flex;
+      align-items: center;
+    }
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &::marker {
+      content: '';
+    }
+    & .chevron {
+      transition: transform var(--transition);
+      transform: rotate(0deg);
+    }
+  }
+}

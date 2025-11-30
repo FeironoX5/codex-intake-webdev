@@ -30,8 +30,8 @@
               }
             ],
             "styles": [
-              "src/styles.css",
-              "node_modules/modern-normalize/modern-normalize.css"
+              "node_modules/modern-normalize/modern-normalize.css",
+              "src/styles.css"
             ]
           },
           "configurations": {
@@ -84,13 +84,53 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.css"]
+            "styles": ["src/styles.css"],
+            "karmaConfig": "karma.conf.js"
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
             "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+          }
+        }
+      }
+    },
+    "basemark": {
+      "projectType": "library",
+      "root": "projects/basemark",
+      "sourceRoot": "projects/basemark/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/basemark/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/basemark/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/basemark/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "sourceMap": true,
+            "karmaConfig": "projects/basemark/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/basemark/**/*.ts",
+              "projects/basemark/**/*.html"
+            ],
+            "eslintConfig": "projects/basemark/eslint.config.js"
           }
         }
       }

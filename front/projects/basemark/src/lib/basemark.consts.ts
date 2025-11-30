@@ -24,6 +24,153 @@ export const rulesRegistry: RulesRegistry = {
       children: [],
     }),
   },
+  tableCell: {
+    openCondition: () => -1,
+    continueCondition: () => -1,
+    createNode: () => ({
+      type: 'tableCell' as const,
+      value: '',
+    }),
+    createNodeFrom: (line) => ({
+      ...rulesRegistry.tableCell.createNode(),
+      value: line.trim(),
+    }),
+  },
+  tableRow: {
+    openCondition: () => -1,
+    continueCondition: () => -1,
+    createNode: () => ({
+      type: 'tableRow' as const,
+      children: [],
+    }),
+    createNodeFrom: (line) => {
+      const content = line.trim().replace(/^\||\|$/g, '');
+      const cells = content.split('|');
+      return {
+        ...rulesRegistry.tableRow.createNode(),
+        children: cells.map((cellText) =>
+          rulesRegistry.tableCell.createNodeFrom!(cellText),
+        ),
+      };
+    },
+  },
+  table: {
+    openCondition: (line) => (line.trim().startsWith('|') ? line.length : -1),
+    continueCondition: (line) => (line.trim().startsWith('|') ? 0 : -1),
+    createNode: () => ({
+      type: 'table' as const,
+      children: [],
+    }),
+    createNodeFrom: (line) => ({
+      ...rulesRegistry.table.createNode(),
+      children: [rulesRegistry.tableRow.createNodeFrom!(line)],
+    }),
+  },
+  orderedListItem: {
+    openCondition: (line, parent) => {
+      if (parent.type !== 'orderedList') return -1;
+      const expectedIndent = (parent as ListNode).level;
+      const content = line.slice(expectedIndent);
+      return /^\d+\.\s/.test(content) ? line.length : -1;
+    },
+    continueCondition: () => -1,
+    createNode: () => ({
+      type: 'orderedListItem' as const,
+      value: '',
+    }),
+    createNodeFrom: (line) => {
+      const indent = CharUtils.countSpaces(line);
+      const content = line.slice(indent);
+      const match = content.match(/^(\d+)\.\s/);
+      const offset = match ? match[0].length : 0;
+      return {
+        ...rulesRegistry.orderedListItem.createNode(),
+        value: line.slice(indent + offset),
+      };
+    },
+  },
+  orderedList: {
+    openCondition: (line, parent) => {
+      const indent = CharUtils.countSpaces(line);
+      const expectedIndent =
+        parent.type === 'orderedList' ? (parent as ListNode).level + 1 : 0;
+      if (indent === expectedIndent) {
+        return /^\d+\.\s/.test(line.slice(indent)) ? line.length : -1;
+      }
+      return -1;
+    },
+    continueCondition: (line, _, self) => {
+      const indent = CharUtils.countSpaces(line);
+      const expectedIndent = (self as ListNode).level;
+      if (indent >= expectedIndent) {
+        return /^\d+\.\s/.test(line.slice(indent)) ? 0 : -1;
+      }
+      return -1;
+    },
+    createNode: () => ({
+      type: 'orderedList' as const,
+      level: 0,
+      children: [rulesRegistry.orderedListItem.createNode()],
+    }),
+    createNodeFrom: (line) => ({
+      ...rulesRegistry.orderedList.createNode(),
+      level: CharUtils.countSpaces(line),
+      children: [rulesRegistry.orderedListItem.createNodeFrom!(line)],
+    }),
+  },
+  taskListItem: {
+    openCondition: (line, parent) => {
+      if (parent.type !== 'taskList') return -1;
+      const expectedIndent = (parent as ListNode).level;
+      if (/^-\s\[[ xX]\]\s/.test(line.slice(expectedIndent)))
+        return line.length;
+      return -1;
+    },
+    continueCondition: () => -1,
+    createNode: () => ({
+      type: 'taskListItem' as const,
+      value: '',
+      checked: false,
+    }),
+    createNodeFrom: (line) => {
+      const indent = CharUtils.countSpaces(line);
+      const checked = line.slice(indent + 3, indent + 4).toLowerCase() === 'x';
+      return {
+        ...rulesRegistry.taskListItem.createNode(),
+        value: line.slice(indent + 6),
+        checked,
+      };
+    },
+  },
+  taskList: {
+    openCondition: (line, parent) => {
+      const indent = CharUtils.countSpaces(line);
+      const expectedIndent =
+        parent.type === 'taskList' ? (parent as ListNode).level + 1 : 0;
+      if (indent === expectedIndent) {
+        return /^-\s\[[ xX]\]\s/.test(line.slice(indent)) ? line.length : -1;
+      }
+      return -1;
+    },
+    continueCondition: (line, _, self) => {
+      const indent = CharUtils.countSpaces(line);
+      const expectedIndent = (self as ListNode).level;
+      if (indent >= expectedIndent) {
+        return /^-\s\[[ xX]\]\s/.test(line.slice(indent)) ? 0 : -1;
+      }
+      return -1;
+    },
+    createNode: () => ({
+      type: 'taskList' as const,
+      level: 0,
+      children: [rulesRegistry.taskListItem.createNode()],
+    }),
+    createNodeFrom: (line) => ({
+      ...rulesRegistry.taskList.createNode(),
+      level: CharUtils.countSpaces(line),
+      children: [rulesRegistry.taskListItem.createNodeFrom!(line)],
+    }),
+  },
   listItem: {
     openCondition: (line, parent) => {
       if (parent.type !== 'list') return -1;
@@ -103,6 +250,14 @@ export const rulesRegistry: RulesRegistry = {
         value: line.slice(level + 1),
       };
     },
+  },
+  horizontalRule: {
+    openCondition: (line) =>
+      /^(?:-{3,}|\*{3,}|_{3,})$/.test(line.trim()) ? line.length : -1,
+    continueCondition: () => -1, // Не продолжается на следующей строке
+    createNode: () => ({
+      type: 'horizontalRule' as const,
+    }),
   },
   paragraph: {
     openCondition: (line) => line.length,

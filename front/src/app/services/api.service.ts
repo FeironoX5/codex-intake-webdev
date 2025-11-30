@@ -23,7 +23,7 @@ type NDJSONMessage = {
   delta?: string;
 };
 
-export type UIEvent = 'collapseReasoning';
+export type UIEvent = 'startReasoning' | 'collapseReasoning';
 
 export type UserMessage = {
   id: number;
@@ -151,6 +151,7 @@ export class ApiService {
 
     switch (msg.type) {
       case 'reasoning-start':
+        uiEvents$.next('startReasoning');
         this.updateMessage(() => ({ reasoningText: '' }));
         break;
       case 'reasoning-delta':

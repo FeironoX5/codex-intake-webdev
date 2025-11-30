@@ -1,28 +1,19 @@
 <main>
   <div class="content">
-    <div class="sp"></div>
-    <div class="sp" style="background: green"></div>
-    <div class="sp"></div>
-    <div class="sp"></div>
-    <div class="sp"></div>
-    <div class="sp"></div>
-    <div class="sp"></div>
-    <div class="sp"></div>
-    <div class="sp"></div>
-    <div class="sp"></div>
+    <app-feed-component />
   </div>
   <div class="chat-container">
     <textarea
       #chat
       class="autosize"
-      placeholder="How can I help you today?"
-      rows="1"
+      placeholder="Ask anything"
+      rows="2"
       [(ngModel)]="chatValue"
       (input)="
-        chat.style.height = 'auto';
-        chat.style.height = chat.scrollHeight + 'px';
-        console.log(chat.scrollHeight)
+        chat.style.height = 'auto'; chat.style.height = chat.scrollHeight + 'px'
       ">
+    }
     </textarea>
+    <button (click)="api.submitUserMessage(chatValue())">Send</button>
   </div>
 </main>

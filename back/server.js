@@ -12,6 +12,8 @@ app.use(cors({origin: 'http://localhost:4200'}));
 
 app.post('/api', async (req, res) => {
     try {
+        // todo remove magic consts to .env
+        // todo разобраться с приоритетами env/.env
         const response = await fetch('http://llm.codex.so/stream', {
             method: 'POST',
             headers: {
@@ -25,6 +27,7 @@ app.post('/api', async (req, res) => {
     } catch (error) {
         console.error(error);
         if (!res.headersSent) {
+            // todo status
             res.status(500).json({error: error.message});
         }
     }

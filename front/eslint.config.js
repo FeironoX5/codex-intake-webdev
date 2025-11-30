@@ -35,7 +35,7 @@ module.exports = tseslint.config(
       '@angular-eslint/prefer-output-readonly': 'warn',
       // ts
       '@typescript-eslint/consistent-type-assertions': 'warn',
-      '@typescript-eslint/consistent-type-definitions': ['warn', 'type'],
+      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
       '@typescript-eslint/explicit-function-return-type': 'error',
       '@typescript-eslint/naming-convention': [
         'warn',

@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
 :root {
   /* text styles */
-  --f-primary: InterVariable;
-  --f-code: JetBrainsMono;
+  --f-primary: 'Inter', sans-serif;
+  --f-code: 'JetBrains Mono', monospace;
   /* colors */
   --c-l0: #000000;
   --c-l1: #1b1b1b;
@@ -14,26 +16,27 @@
   /* gradients */
   --grad-overlay: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgb(0, 0, 0));
   /* sizes */
-  --s-font: 16px;
-  --s-content: 700px;
+  --s-content: 600px;
   --s-stroke: 1px;
   --s-chat-container-offset: 20px;
   --s-button-gap: 4px;
+  --s-content-gap: 25px;
+  --s-icon-button-height: calc(var(--p-button-v) * 2 + 1lh);
   /* paddings */
   --p-button-v: 3px;
   --p-button: var(--p-button-v) 11px;
   --p-chat-container-v: 14px;
   --p-textarea-v: 5px;
   --p-content-b: calc(
-    1rlh * (var(--textarea-lines-min) + 2)
-      /* extra line for buttons and main padding */ +
+    1rlh * var(--textarea-lines-min)
+      /* extra line for buttons padding, minus line for main padding */ +
       var(--p-chat-container-v) * 2 + var(--p-button-v) * 2 +
       var(--s-chat-container-offset)
   );
   /* misc */
   --textarea-lines-min: 2;
   --textarea-lines-max: 4;
-  --border-radius: 16px;
+  --border-radius: 15px;
   --transition: 0.1s ease-out;
 }
 
@@ -47,9 +50,14 @@
 }
 
 html {
+  font-family: var(--f-primary);
+  font-weight: 400;
+  font-stretch: normal;
+  font-style: normal;
+  letter-spacing: normal;
   color: var(--c-text);
-  font-size: var(--s-font);
-  line-height: 1.15;
+  font-size: 14px;
+  line-height: 22px;
 }
 
 body {
@@ -62,9 +70,16 @@ textarea {
   outline: none;
   resize: none;
   overflow: hidden;
+
+  &.autosize {
+    padding: var(--p-textarea-v) 0;
+    height: calc(var(--textarea-lines-min) * 1rlh + var(--p-textarea-v) * 2);
+    max-height: calc(var(--textarea-lines-max) * 1rlh);
+  }
 }
 
 button {
+  font-weight: 500;
   background: none;
   border: none;
   outline-width: var(--s-stroke);
@@ -79,28 +94,36 @@ button {
   display: flex;
   align-items: center;
   gap: var(--s-button-gap);
+
+  &:hover {
+    color: var(--c-text);
+    outline-color: var(--c-text);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    /* todo override hover */
+  }
+
+  &.active {
+    outline-color: var(--c-accent-l0);
+    background: var(--c-accent-l0);
+    color: var(--c-accent-text);
+  }
+
+  &.filled {
+    border-radius: 5px;
+    outline: none;
+    padding: var(--p-button-v) 5px;
+    &:hover {
+      background: var(--c-l1);
+    }
+  }
 }
 
-button:hover {
-  color: var(--c-text);
-  outline-color: var(--c-text);
-}
-
-button.active {
-  outline-color: var(--c-accent-l0);
-  background: var(--c-accent-l0);
-  color: var(--c-accent-text);
-}
-
-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  /* todo override hover */
-}
-
-/* components */
-textarea.autosize {
-  padding: var(--p-textarea-v) 0;
-  height: calc(var(--textarea-lines-min) * 1rlh + var(--p-textarea-v) * 2);
-  max-height: calc(var(--textarea-lines-max) * 1rlh);
+lucide-angular {
+  height: 1lh;
+  display: flex;
+  align-items: center;
 }

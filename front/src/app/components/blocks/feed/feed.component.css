@@ -1,0 +1,5 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s-icon-button-height) + var(--s-content-gap));
+}

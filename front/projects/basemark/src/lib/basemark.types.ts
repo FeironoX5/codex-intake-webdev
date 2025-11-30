@@ -15,11 +15,32 @@ export interface RootNode extends ContainerNode {
 export interface BlockquoteNode extends ContainerNode {
   type: 'blockquote';
 }
+export interface TableNode extends ContainerNode {
+  type: 'table';
+}
+export interface TableRowNode extends ContainerNode {
+  type: 'tableRow';
+}
 export interface ListNode extends ContainerNode {
   type: 'list';
   level: number;
 }
-export type ContainerNodes = RootNode | BlockquoteNode | ListNode;
+export interface OrderedListNode extends ContainerNode {
+  type: 'orderedList';
+  level: number;
+}
+export interface TaskListNode extends ContainerNode {
+  type: 'taskList';
+  level: number;
+}
+export type ContainerNodes =
+  | RootNode
+  | BlockquoteNode
+  | TableNode
+  | TableRowNode
+  | ListNode
+  | OrderedListNode
+  | TaskListNode;
 // -----
 export interface BlockRule<T extends BlockNode> {
   // returns -1 if condition not satisfied
@@ -50,9 +71,30 @@ export interface CodeBlockNode extends TextNode {
 export interface ListItemNode extends TextNode {
   type: 'listItem';
 }
-type TextNodes = ParagraphNode | HeadingNode | CodeBlockNode | ListItemNode;
+export interface OrderedListItemNode extends TextNode {
+  type: 'orderedListItem';
+}
+export interface TaskListItemNode extends TextNode {
+  type: 'taskListItem';
+}
+export interface TableCellNode extends TextNode {
+  type: 'tableCell';
+}
+type TextNodes =
+  | ParagraphNode
+  | HeadingNode
+  | CodeBlockNode
+  | ListItemNode
+  | OrderedListItemNode
+  | TaskListItemNode
+  | TableCellNode;
 // -----
-export type ASTNodes = ContainerNodes | TextNodes;
+export interface HorizontalRuleNode extends BlockNode {
+  type: 'horizontalRule';
+}
+export type OtherNodes = HorizontalRuleNode;
+// -----
+export type ASTNodes = ContainerNodes | TextNodes | OtherNodes;
 // -----
 export interface CreateElementEvent {
   type: 'create';
