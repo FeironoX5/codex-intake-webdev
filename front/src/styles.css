@@ -31,7 +31,8 @@
     1rlh * var(--textarea-lines-min)
       /* extra line for buttons padding, minus line for main padding */ +
       var(--p-chat-container-v) * 2 + var(--p-button-v) * 2 +
-      var(--s-chat-container-offset)
+      var(--s-chat-container-offset) + var(--s-icon-button-height) +
+      var(--s-content-gap)
   );
   /* misc */
   --textarea-lines-min: 2;
@@ -118,6 +119,16 @@ button {
     padding: var(--p-button-v) 5px;
     &:hover {
       background: var(--c-l1);
+    }
+  }
+
+  &.lighted {
+    color: var(--c-accent-l0);
+    outline: none;
+    opacity: 0.8;
+    transition: opacity var(--transition);
+    &:hover {
+      opacity: 1;
     }
   }
 }

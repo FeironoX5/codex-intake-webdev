@@ -5,13 +5,13 @@ import {
   provideZoneChangeDetection,
 } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
-import { fakeStreamProvider, STREAM_PROVIDER } from './app/tokens/stream.token';
+import { realStreamProvider, STREAM_PROVIDER } from './app/tokens/stream.token';
 
 bootstrapApplication(App, {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideHttpClient(),
-    { provide: STREAM_PROVIDER, useValue: fakeStreamProvider },
+    { provide: STREAM_PROVIDER, useValue: realStreamProvider },
   ],
 }).catch((err) => console.error(err));

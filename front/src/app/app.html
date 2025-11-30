@@ -1,6 +1,6 @@
 <main>
   <div class="content">
-    <app-feed-component />
+    <app-feed-component (output)="chatValue.set($event)" />
   </div>
   <div class="chat-container">
     <textarea
