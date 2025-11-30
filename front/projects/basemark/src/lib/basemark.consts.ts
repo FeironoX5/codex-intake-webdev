@@ -1,11 +1,12 @@
 import { ListNode, RulesRegistry } from './basemark.types';
 import { CharUtils } from './basemark.utils';
 
+// todo inline text decorations parsing
 export const rulesRegistry: RulesRegistry = {
   root: {
     createNode: () => ({
       type: 'root' as const,
-      children: [{ type: 'paragraph', value: '' }],
+      children: [],
     }),
   },
   blockquote: {
@@ -20,41 +21,35 @@ export const rulesRegistry: RulesRegistry = {
     },
     createNode: () => ({
       type: 'blockquote' as const,
-      children: [
-        {
-          type: 'paragraph',
-          value: '',
-        },
-      ],
+      children: [],
     }),
   },
   listItem: {
     openCondition: (line, parent) => {
       if (parent.type !== 'list') return -1;
       const expectedIndent = (parent as ListNode).level;
-      if (line.slice(expectedIndent).startsWith('- '))
-        return expectedIndent + 2;
+      if (line.slice(expectedIndent).startsWith('- ')) return line.length;
+      // return expectedIndent + 2;
       return -1;
     },
     continueCondition: () => -1,
     createNode: () => ({
       type: 'listItem' as const,
-      children: [
-        {
-          type: 'paragraph',
-          value: '',
-        },
-      ],
+      value: '',
+    }),
+    createNodeFrom: (line) => ({
+      ...rulesRegistry.listItem.createNode(),
+      value: line.slice(CharUtils.countSpaces(line) + 2),
     }),
   },
+  // todo double indent instead of single indent
   list: {
     openCondition: (line, parent) => {
       const indent = CharUtils.countSpaces(line);
       const expectedIndent =
         parent.type === 'list' ? (parent as ListNode).level + 1 : 0;
       if (indent === expectedIndent) {
-        line = line.slice(indent);
-        return line.startsWith('- ') ? indent + 2 : -1;
+        return line.slice(indent).startsWith('- ') ? line.length : -1;
       }
       return -1;
     },
@@ -74,6 +69,7 @@ export const rulesRegistry: RulesRegistry = {
     createNodeFrom: (line) => ({
       ...rulesRegistry.list.createNode(),
       level: CharUtils.countSpaces(line),
+      children: [rulesRegistry.listItem.createNodeFrom!(line)],
     }),
   },
   codeBlock: {
@@ -109,8 +105,20 @@ export const rulesRegistry: RulesRegistry = {
     },
   },
   paragraph: {
-    openCondition: () => 0,
-    continueCondition: (line) => (line.trim().length === 0 ? -1 : 0),
+    openCondition: (line) => line.length,
+    continueCondition: (line) => {
+      for (const [ruleKey, rule] of Object.entries(rulesRegistry)) {
+        if (ruleKey === 'paragraph') continue;
+        if (!rule.openCondition) continue;
+        const matchLength = rule.openCondition(line, {
+          type: 'root',
+          children: [],
+          // todo openCondition > openCondition?
+        });
+        if (matchLength >= 0) return -1;
+      }
+      return line.trim().length === 0 ? -1 : line.length;
+    },
     createNode: () => ({
       type: 'paragraph' as const,
       value: '',

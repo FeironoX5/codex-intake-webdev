@@ -19,14 +19,7 @@ export interface ListNode extends ContainerNode {
   type: 'list';
   level: number;
 }
-export interface ListItemNode extends ContainerNode {
-  type: 'listItem';
-}
-export type ContainerNodes =
-  | RootNode
-  | BlockquoteNode
-  | ListNode
-  | ListItemNode;
+export type ContainerNodes = RootNode | BlockquoteNode | ListNode;
 // -----
 export interface BlockRule<T extends BlockNode> {
   // returns -1 if condition not satisfied
@@ -34,7 +27,7 @@ export interface BlockRule<T extends BlockNode> {
   continueCondition?: (
     line: string,
     parent: ContainerNode,
-    self: ContainerNode,
+    self: BlockNode,
   ) => number;
   createNode: () => T;
   createNodeFrom?: (line: string) => T;
@@ -54,7 +47,10 @@ export interface CodeBlockNode extends TextNode {
   type: 'codeBlock';
   language?: string;
 }
-type TextNodes = ParagraphNode | HeadingNode | CodeBlockNode;
+export interface ListItemNode extends TextNode {
+  type: 'listItem';
+}
+type TextNodes = ParagraphNode | HeadingNode | CodeBlockNode | ListItemNode;
 // -----
 export type ASTNodes = ContainerNodes | TextNodes;
 // -----

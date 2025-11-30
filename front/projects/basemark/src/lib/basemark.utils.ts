@@ -3,6 +3,7 @@ import {
   ContainerNode,
   RootNode,
   RulesRegistry,
+  TextNode,
 } from './basemark.types';
 import { rulesRegistry } from './basemark.consts';
 
@@ -64,16 +65,47 @@ export class CharUtils {
 export class BaseMarkTree {
   private readonly root: RootNode = rulesRegistry.root.createNode();
 
-  public getLastOpenContainerNode(line: string): {
-    lastOpenContainerNode: ContainerNode;
-    lineRest: string;
+  public static isTextNode(node: BlockNode): node is TextNode {
+    return 'value' in node;
+  }
+
+  // public getLastOpenNode(): BlockNode {
+  //   let currentNode: BlockNode = this.root;
+  //   while (
+  //     this.isContainerNode(currentNode) &&
+  //     currentNode.children.length > 0
+  //   ) {
+  //     currentNode = this.getLastNode(currentNode);
+  //   }
+  //   return currentNode;
+  // }
+
+  public getRoot(): RootNode {
+    return this.root;
+  }
+
+  public static isContainerNode(node: BlockNode): node is ContainerNode {
+    return 'children' in node;
+  }
+
+  private static getLastNode(node: ContainerNode): BlockNode {
+    return node.children[node.children.length - 1];
+  }
+
+  public getLastOpenNode(line: string): {
+    lastOpenNode: BlockNode;
+    rest: string;
   } {
     let lineBuffer = line;
-    let currentNode: ContainerNode = this.root;
+    let currentNode: BlockNode = this.root;
     while (true) {
-      if (currentNode.children.length === 0) break;
-      const lastChild = this.getLastNode(currentNode);
-      if (!this.isContainerNode(lastChild)) break;
+      if (
+        !BaseMarkTree.isContainerNode(currentNode) ||
+        currentNode.children.length === 0
+      ) {
+        break;
+      }
+      const lastChild = BaseMarkTree.getLastNode(currentNode);
       const rule = rulesRegistry[lastChild.type as keyof RulesRegistry];
       if (!rule) break;
       if (!rule.continueCondition) {
@@ -90,31 +122,8 @@ export class BaseMarkTree {
       currentNode = lastChild;
     }
     return {
-      lastOpenContainerNode: currentNode,
-      lineRest: lineBuffer,
+      lastOpenNode: currentNode,
+      rest: lineBuffer,
     };
-  }
-
-  public getLastOpenNode(): BlockNode {
-    let currentNode: BlockNode = this.root;
-    while (
-      this.isContainerNode(currentNode) &&
-      currentNode.children.length > 0
-    ) {
-      currentNode = this.getLastNode(currentNode);
-    }
-    return currentNode;
-  }
-
-  public getRoot(): RootNode {
-    return this.root;
-  }
-
-  private getLastNode(node: ContainerNode): BlockNode {
-    return node.children[node.children.length - 1];
-  }
-
-  private isContainerNode(node: BlockNode): node is ContainerNode {
-    return 'children' in node;
   }
 }

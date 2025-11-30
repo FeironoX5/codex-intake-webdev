@@ -15,7 +15,10 @@ export class BaseMark {
   private tree = new BaseMarkTree();
 
   constructor(oin?: Observable<string>, initialText?: string) {
-    if (initialText) this.processChunk(initialText);
+    if (initialText) {
+      this.processChunk(initialText);
+      if (this.lineBuffer) this.processLine(this.getLineBuffer());
+    }
     if (oin) {
       oin.subscribe({
         next: (chunk) => this.processChunk(chunk),
@@ -31,6 +34,7 @@ export class BaseMark {
 
   private processChunk(chunk: string): void {
     for (const c of chunk) {
+      console.log('!!!BM (processChunk):', c);
       if (CharUtils.isLineEnding(c)) {
         this.processLine(this.getLineBuffer());
       } else {
@@ -40,21 +44,28 @@ export class BaseMark {
   }
 
   private processLine(line: string): void {
-    const info = this.tree.getLastOpenContainerNode(line);
-    const lastOpenContainerNode = info.lastOpenContainerNode;
-    let lineRest = info.lineRest;
-    for (const rule of Object.values(rulesRegistry)) {
-      if (!rule.openCondition) continue;
-      const matchLength = rule.openCondition(lineRest, lastOpenContainerNode);
-      if (matchLength >= 0) {
-        this.createNode(lastOpenContainerNode, rule, lineRest);
-        lineRest = lineRest.slice(matchLength);
-        break;
+    console.log('!!!BM (processLine):', line);
+    let lineRest = line;
+    let isFirstTry = true;
+    while (lineRest.length > 0 || isFirstTry) {
+      const info = this.tree.getLastOpenNode(line);
+      const lastOpenNode = info.lastOpenNode;
+      let rest = info.rest;
+      if (BaseMarkTree.isTextNode(lastOpenNode)) {
+        this.updateNode(lastOpenNode, lineRest);
+        return;
+      } else if (BaseMarkTree.isContainerNode(lastOpenNode)) {
+        for (const rule of Object.values(rulesRegistry)) {
+          if (!rule.openCondition) continue;
+          const matchLength = rule.openCondition(rest, lastOpenNode);
+          if (matchLength < 0) continue;
+          this.createNode(lastOpenNode, rule, rest);
+          rest = rest.slice(matchLength);
+          break;
+        }
       }
-    }
-    if (lineRest) {
-      const lastOpenNode = this.tree.getLastOpenNode() as TextNode;
-      this.updateNode(lastOpenNode, lineRest);
+      lineRest = rest;
+      isFirstTry = false;
     }
   }
 
