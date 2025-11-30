@@ -28,7 +28,7 @@ export type ContainerNodes =
   | ListNode
   | ListItemNode;
 // -----
-interface BlockRule<T extends ContainerNode> {
+export interface BlockRule<T extends BlockNode> {
   // returns -1 if condition not satisfied
   openCondition?: (line: string, parent: ContainerNode) => number;
   continueCondition?: (
@@ -40,21 +40,23 @@ interface BlockRule<T extends ContainerNode> {
   createNodeFrom?: (line: string) => T;
 }
 export type RulesRegistry = {
-  [K in ContainerNodes['type']]: BlockRule<
-    Extract<ContainerNodes, { type: K }>
-  >;
+  [K in ASTNodes['type']]: BlockRule<Extract<ASTNodes, { type: K }>>;
 };
 // -----
-interface ParagraphNode extends TextNode {
+export interface ParagraphNode extends TextNode {
   type: 'paragraph';
 }
-interface HeadingNode extends TextNode {
+export interface HeadingNode extends TextNode {
   type: 'heading';
   level: 1 | 2 | 3 | 4 | 5 | 6;
 }
-type TextNodes = ParagraphNode | HeadingNode;
+export interface CodeBlockNode extends TextNode {
+  type: 'codeBlock';
+  language?: string;
+}
+type TextNodes = ParagraphNode | HeadingNode | CodeBlockNode;
 // -----
-export type ASTNode = ContainerNodes | TextNodes;
+export type ASTNodes = ContainerNodes | TextNodes;
 // -----
 export interface CreateElementEvent {
   type: 'create';
@@ -62,6 +64,6 @@ export interface CreateElementEvent {
 }
 export interface UpdateContentEvent {
   type: 'update';
-  id: number;
+  value: string;
 }
 export type BaseMarkEvent = CreateElementEvent | UpdateContentEvent;

@@ -64,7 +64,10 @@ export class CharUtils {
 export class BaseMarkTree {
   private readonly root: RootNode = rulesRegistry.root.createNode();
 
-  public getLastOpenContainerNode(line: string): [ContainerNode, string] {
+  public getLastOpenContainerNode(line: string): {
+    lastOpenContainerNode: ContainerNode;
+    lineRest: string;
+  } {
     let lineBuffer = line;
     let currentNode: ContainerNode = this.root;
     while (true) {
@@ -86,7 +89,10 @@ export class BaseMarkTree {
       lineBuffer = lineBuffer.slice(sliceLength);
       currentNode = lastChild;
     }
-    return [currentNode, lineBuffer];
+    return {
+      lastOpenContainerNode: currentNode,
+      lineRest: lineBuffer,
+    };
   }
 
   public getLastOpenNode(): BlockNode {

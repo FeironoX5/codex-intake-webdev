@@ -5,6 +5,23 @@ import { CreateElementEvent } from './basemark.types';
 describe('BaseMark', () => {
   const tests = [
     {
+      inp: '```python\nprint("Hello")\n```\nBye',
+      expected: {
+        type: 'root',
+        children: [
+          {
+            type: 'codeBlock',
+            language: 'python',
+            children: [{ type: 'paragraph', value: 'print("Hello")' }],
+          },
+          {
+            type: 'paragraph',
+            value: 'Bye',
+          },
+        ],
+      },
+    },
+    {
       inp: `- point 0
 - point 1
  - point 1.1

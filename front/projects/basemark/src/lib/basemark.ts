@@ -1,5 +1,11 @@
 import { Observable, Subject } from 'rxjs';
-import { BaseMarkEvent, TextNode } from './basemark.types';
+import {
+  BaseMarkEvent,
+  BlockNode,
+  BlockRule,
+  ContainerNode,
+  TextNode,
+} from './basemark.types';
 import { BaseMarkTree, CharUtils } from './basemark.utils';
 import { rulesRegistry } from './basemark.consts';
 
@@ -8,12 +14,19 @@ export class BaseMark {
   private lineBuffer = '';
   private tree = new BaseMarkTree();
 
-  constructor(oin: Observable<string>) {
-    oin.subscribe({
-      next: (chunk) => this.processChunk(chunk),
-      error: (err) => console.error(err),
-      complete: () => this.onComplete(),
-    });
+  constructor(oin?: Observable<string>, initialText?: string) {
+    if (initialText) this.processChunk(initialText);
+    if (oin) {
+      oin.subscribe({
+        next: (chunk) => this.processChunk(chunk),
+        error: (err) => console.error(err),
+        complete: () => this.onComplete(),
+      });
+    }
+  }
+
+  public getTree(): BaseMarkTree {
+    return this.tree;
   }
 
   private processChunk(chunk: string): void {
@@ -27,28 +40,45 @@ export class BaseMark {
   }
 
   private processLine(line: string): void {
-    console.log('(>)', line);
     const info = this.tree.getLastOpenContainerNode(line);
-    const lastOpenContainerNode = info[0];
-    let lineRest = info[1];
-    // console.log('(<)', lastOpenContainerNode, '|||||', lineRest);
+    const lastOpenContainerNode = info.lastOpenContainerNode;
+    let lineRest = info.lineRest;
     for (const rule of Object.values(rulesRegistry)) {
       if (!rule.openCondition) continue;
       const matchLength = rule.openCondition(lineRest, lastOpenContainerNode);
       if (matchLength >= 0) {
-        lastOpenContainerNode.children.push(
-          rule.createNodeFrom
-            ? rule.createNodeFrom(lineRest)
-            : rule.createNode(),
-        );
+        this.createNode(lastOpenContainerNode, rule, lineRest);
         lineRest = lineRest.slice(matchLength);
-        // console.log('(!)', rule.createNode().type, lastOpenContainerNode);
         break;
       }
     }
-    const lastOpenNode = this.tree.getLastOpenNode() as TextNode;
-    lastOpenNode.value += lineRest;
-    console.log('(E)', JSON.stringify(this.tree));
+    if (lineRest) {
+      const lastOpenNode = this.tree.getLastOpenNode() as TextNode;
+      this.updateNode(lastOpenNode, lineRest);
+    }
+  }
+
+  private createNode(
+    parentNode: ContainerNode,
+    rule: BlockRule<BlockNode>,
+    line: string,
+  ): void {
+    const node = rule.createNodeFrom
+      ? rule.createNodeFrom(line)
+      : rule.createNode();
+    parentNode.children.push(node);
+    this.sout.next({
+      type: 'create',
+      node,
+    });
+  }
+
+  private updateNode(node: TextNode, line: string): void {
+    node.value += line;
+    this.sout.next({
+      type: 'update',
+      value: node.value,
+    });
   }
 
   private getLineBuffer(): string {
@@ -58,13 +88,7 @@ export class BaseMark {
   }
 
   private onComplete(): void {
-    if (this.lineBuffer) {
-      this.processLine(this.getLineBuffer());
-    }
-    this.sout.next({
-      type: 'create',
-      node: this.tree.getRoot(),
-    });
+    if (this.lineBuffer) this.processLine(this.getLineBuffer());
     this.sout.complete();
   }
 }
