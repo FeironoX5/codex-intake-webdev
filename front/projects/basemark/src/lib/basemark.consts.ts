@@ -57,7 +57,7 @@ export const rulesRegistry: RulesRegistry = {
       const indent = CharUtils.countSpaces(line);
       const expectedIndent = (self as ListNode).level;
       if (indent >= expectedIndent) {
-        return 0;
+        return line.slice(indent).startsWith('- ') ? 0 : -1;
       }
       return -1;
     },
